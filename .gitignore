@@ -1,0 +1,11 @@
+node_modules/
+dist/
+out/
+*.vsix
+.vscode-test/
+.env
+.env.*
+!.env.example
+Configuracion.md
+.DS_Store
+Thumbs.db
