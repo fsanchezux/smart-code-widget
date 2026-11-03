@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smart-code-widget.dev/schema/pagina.v0.json",
+  "title": "Página (v0)",
+  "description": "Representación intermedia de una página: estructura, anclas y props de sus componentes. Fuente de verdad; el .md es su vista editable.",
+  "type": "object",
+  "required": ["version", "pagina", "raiz", "componentes"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "const": 0 },
+    "pagina": { "$ref": "#/$defs/nombre" },
+    "descripcion": { "type": "string" },
+    "raiz": {
+      "description": "Componentes de primer nivel, en el orden en que aparecen en la página.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/idComponente" },
+      "uniqueItems": true
+    },
+    "componentes": {
+      "description": "Todos los componentes de la página, indexados por id lógico.",
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/idComponente" },
+      "additionalProperties": { "$ref": "#/$defs/componente" }
+    }
+  },
+  "$defs": {
+    "nombre": {
+      "description": "Nombre en PascalCase (página o componente).",
+      "type": "string",
+      "pattern": "^[A-Z][A-Za-z0-9]*$"
+    },
+    "idComponente": {
+      "description": "Id lógico Pagina/Componente, p. ej. Home/BotonContacto.",
+      "type": "string",
+      "pattern": "^[A-Z][A-Za-z0-9]*/[A-Z][A-Za-z0-9]*$"
+    },
+    "nombreLocal": {
+      "description": "Nombre de ancla dentro de su componente (contenedor, texto, estado…).",
+      "type": "string",
+      "pattern": "^[a-z][a-zA-Z0-9]*$"
+    },
+    "componente": {
+      "type": "object",
+      "required": ["tipo", "anclas"],
+      "additionalProperties": false,
+      "properties": {
+        "tipo": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "examples": ["grupo", "section", "text", "button", "link", "input", "list", "item"]
+        },
+        "anclas": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": { "$ref": "#/$defs/nombreLocal" },
+          "additionalProperties": { "$ref": "#/$defs/ancla" }
+        },
+        "props": {
+          "type": "object",
+          "propertyNames": { "pattern": "^[a-z][a-z0-9-]*$" },
+          "additionalProperties": { "$ref": "#/$defs/prop" }
+        },
+        "hijos": {
+          "description": "Componentes anidados, en orden.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/idComponente" },
+          "uniqueItems": true
+        },
+        "descripcion": { "type": "string" }
+      }
+    },
+    "ancla": {
+      "description": "Elemento del código que forma parte del componente. Se localiza por data-uid (o comentario @uid en lógica) o por selector CSS; nunca por número de línea.",
+      "type": "object",
+      "required": ["fichero", "rol"],
+      "additionalProperties": false,
+      "properties": {
+        "uid": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "selector": { "type": "string", "minLength": 1 },
+        "fichero": {
+          "description": "Ruta relativa a la raíz del proyecto web, con barras /.",
+          "type": "string",
+          "pattern": "^[^/\\\\][^\\\\]*$"
+        },
+        "rol": { "enum": ["visual", "logica"] }
+      },
+      "oneOf": [
+        { "required": ["uid"] },
+        { "required": ["selector"] }
+      ]
+    },
+    "prop": {
+      "type": "object",
+      "required": ["valor", "aplica"],
+      "additionalProperties": false,
+      "properties": {
+        "valor": {
+          "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }]
+        },
+        "aplica": {
+          "description": "Nombres de las anclas del componente a las que afecta.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nombreLocal" }
+        }
+      }
+    }
+  }
+}

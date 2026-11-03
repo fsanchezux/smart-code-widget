@@ -10,7 +10,16 @@ Describes tu web con documentos Markdown estructurados (una página = un documen
 
 ## Estado
 
-🚧 En fase inicial (Hito 0). Ver el plan completo en [docs/CONTEXTO.md](docs/CONTEXTO.md).
+🚧 Hito 1 implementado: editar una prop tipada (`border-radius`, `color`, `texto`, `placeholder`) en `Home.md` y guardar propone el cambio de código con diff revisable. Ver el plan completo en [docs/CONTEXTO.md](docs/CONTEXTO.md).
+
+## Arrancar
+
+```bash
+cd extension && npm install && npm test   # compila y valida Home.json contra el schema
+cd examples/web-demo && npm install && npm run dev
+```
+
+Para probar la extensión: abrir el repo en VS Code y pulsar **F5** ("Ejecutar extensión"), luego `Smart Code Widget: Hola` en la paleta de comandos.
 
 ## Estructura
 

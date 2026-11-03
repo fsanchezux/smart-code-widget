@@ -1,0 +1,275 @@
+{
+  "$schema": "../../../../extension/src/schema/pagina.schema.json",
+  "version": 0,
+  "pagina": "Home",
+  "descripcion": "Portada de la tienda: presentación y un buscador rápido de productos.",
+  "raiz": [
+    "Home/Hero",
+    "Home/BuscadorResultados"
+  ],
+  "componentes": {
+    "Home/Hero": {
+      "tipo": "section",
+      "anclas": {
+        "contenedor": {
+          "uid": "a1",
+          "fichero": "src/pages/Home.tsx",
+          "rol": "visual"
+        }
+      },
+      "props": {
+        "border-radius": {
+          "valor": "16px",
+          "aplica": [
+            "contenedor"
+          ]
+        }
+      },
+      "hijos": [
+        "Home/Titulo",
+        "Home/Subtitulo",
+        "Home/BotonContacto"
+      ],
+      "descripcion": "Bloque de bienvenida centrado, con fondo blanco y sombra suave."
+    },
+    "Home/Titulo": {
+      "tipo": "text",
+      "anclas": {
+        "texto": {
+          "uid": "a2",
+          "fichero": "src/pages/Home.tsx",
+          "rol": "visual"
+        }
+      },
+      "props": {
+        "texto": {
+          "valor": "Encuentra lo que buscas jahe",
+          "aplica": [
+            "texto"
+          ]
+        }
+      }
+    },
+    "Home/Subtitulo": {
+      "tipo": "text",
+      "anclas": {
+        "texto": {
+          "uid": "a3",
+          "fichero": "src/pages/Home.tsx",
+          "rol": "visual"
+        }
+      },
+      "props": {
+        "texto": {
+          "valor": "Productos para tu casa y tu oficina, elegidos con cariño",
+          "aplica": [
+            "texto"
+          ]
+        }
+      }
+    },
+    "Home/BotonContacto": {
+      "tipo": "button",
+      "anclas": {
+        "boton": {
+          "uid": "a4",
+          "fichero": "src/pages/Home.tsx",
+          "rol": "visual"
+        }
+      },
+      "props": {
+        "texto": {
+          "valor": "Contáctanos",
+          "aplica": [
+            "boton"
+          ]
+        },
+        "border-radius": {
+          "valor": "8px",
+          "aplica": [
+            "boton"
+          ]
+        },
+        "color": {
+          "valor": "primario",
+          "aplica": [
+            "boton"
+          ]
+        }
+      },
+      "descripcion": "Botón que abre el formulario de contacto. Al pasar el ratón se oscurece."
+    },
+    "Home/BuscadorResultados": {
+      "tipo": "grupo",
+      "anclas": {
+        "contenedor": {
+          "uid": "a5",
+          "fichero": "src/pages/Home.tsx",
+          "rol": "visual"
+        },
+        "uso": {
+          "uid": "a6",
+          "fichero": "src/pages/Home.tsx",
+          "rol": "logica"
+        },
+        "estado": {
+          "uid": "a7",
+          "fichero": "src/hooks/useSearch.ts",
+          "rol": "logica"
+        }
+      },
+      "props": {
+        "border-radius": {
+          "valor": "12px",
+          "aplica": [
+            "contenedor"
+          ]
+        }
+      },
+      "hijos": [
+        "Home/InputBuscador",
+        "Home/ListaResultados",
+        "Home/Acciones"
+      ],
+      "descripcion": "Busca productos mientras escribes y muestra los resultados."
+    },
+    "Home/InputBuscador": {
+      "tipo": "input",
+      "anclas": {
+        "input": {
+          "uid": "a8",
+          "fichero": "src/pages/Home.tsx",
+          "rol": "visual"
+        }
+      },
+      "props": {
+        "placeholder": {
+          "valor": "Buscar productos…",
+          "aplica": [
+            "input"
+          ]
+        },
+        "border-radius": {
+          "valor": "8px",
+          "aplica": [
+            "input"
+          ]
+        }
+      }
+    },
+    "Home/ListaResultados": {
+      "tipo": "list",
+      "anclas": {
+        "lista": {
+          "uid": "a9",
+          "fichero": "src/pages/Home.tsx",
+          "rol": "visual"
+        }
+      },
+      "hijos": [
+        "Home/TarjetaProducto"
+      ],
+      "descripcion": "Rejilla de hasta 6 productos que coinciden con la búsqueda."
+    },
+    "Home/TarjetaProducto": {
+      "tipo": "item",
+      "anclas": {
+        "tarjeta": {
+          "uid": "a10",
+          "fichero": "src/pages/Home.tsx",
+          "rol": "visual"
+        },
+        "nombre": {
+          "uid": "a11",
+          "fichero": "src/pages/Home.tsx",
+          "rol": "visual"
+        },
+        "precio": {
+          "uid": "a12",
+          "fichero": "src/pages/Home.tsx",
+          "rol": "visual"
+        }
+      },
+      "props": {
+        "border-radius": {
+          "valor": "12px",
+          "aplica": [
+            "tarjeta"
+          ]
+        }
+      },
+      "descripcion": "Nombre del producto y precio en euros con dos decimales."
+    },
+    "Home/Acciones": {
+      "tipo": "grupo",
+      "anclas": {
+        "contenedor": {
+          "uid": "a13",
+          "fichero": "src/pages/Home.tsx",
+          "rol": "visual"
+        }
+      },
+      "hijos": [
+        "Home/BotonLimpiar",
+        "Home/EnlaceVerTodo"
+      ],
+      "descripcion": "Botones alineados a la derecha bajo los resultados."
+    },
+    "Home/BotonLimpiar": {
+      "tipo": "button",
+      "anclas": {
+        "boton": {
+          "uid": "a14",
+          "fichero": "src/pages/Home.tsx",
+          "rol": "visual"
+        }
+      },
+      "props": {
+        "texto": {
+          "valor": "Limpiar",
+          "aplica": [
+            "boton"
+          ]
+        },
+        "border-radius": {
+          "valor": "8px",
+          "aplica": [
+            "boton"
+          ]
+        }
+      },
+      "descripcion": "Vacía el texto del buscador."
+    },
+    "Home/EnlaceVerTodo": {
+      "tipo": "link",
+      "anclas": {
+        "enlace": {
+          "uid": "a15",
+          "fichero": "src/pages/Home.tsx",
+          "rol": "visual"
+        }
+      },
+      "props": {
+        "texto": {
+          "valor": "Ver todo",
+          "aplica": [
+            "enlace"
+          ]
+        },
+        "border-radius": {
+          "valor": "8px",
+          "aplica": [
+            "enlace"
+          ]
+        },
+        "color": {
+          "valor": "secundario",
+          "aplica": [
+            "enlace"
+          ]
+        }
+      },
+      "descripcion": "Lleva a la página de Búsqueda."
+    }
+  }
+}

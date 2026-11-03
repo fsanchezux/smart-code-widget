@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+/* Colores con nombre: la prop `color: primario` del .md se resuelve a estas clases. */
+@theme {
+  --color-primario: #4f46e5;
+  --color-primario-oscuro: #3730a3;
+  --color-secundario: #0f766e;
+  --color-secundario-oscuro: #115e59;
+}

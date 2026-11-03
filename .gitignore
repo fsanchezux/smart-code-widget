@@ -9,3 +9,9 @@ out/
 Configuracion.md
 .DS_Store
 Thumbs.db
+*.tsbuildinfo
+
+# Ejemplo sin secretos: su Configuracion.md sí va a git
+!examples/web-demo/Configuracion.md
+# Settings que escribe la extensión al probarla (files.exclude del modo documento)
+examples/web-demo/.vscode/

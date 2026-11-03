@@ -35,6 +35,14 @@ El proyecto web se describe con documentos estructurados. Una extensión de VS C
         └── …
 ```
 
+### Modo documento (explorador)
+
+Un proyecto del lenguaje se reconoce por tener `Stack.md` en la raíz. Al abrirlo, la extensión oculta en el explorador todo lo que no es documento: solo se ven `Stack.md`, `Configuracion.md`, `Backend.md` y `frontend/` (sin sus `.json`, que no se editan a mano). Un botón 👁 en la cabecera del explorador (a la altura de la carpeta del proyecto) alterna **Mostrar código / Ocultar código**.
+
+- Se implementa con `files.exclude` en los settings del workspace; la extensión solo añade y quita sus propios patrones, nunca los del usuario.
+- Por defecto el código empieza oculto; la elección se recuerda por workspace.
+- Mientras está oculto, Ctrl+P y la búsqueda tampoco encuentran el código (heredan `files.exclude`). Por la misma razón, la extensión **no debe usar `workspace.findFiles`** para localizar anclas: leer los ficheros por ruta.
+
 ---
 
 ## 3. Modelo de componente
@@ -193,20 +201,30 @@ Permite: panel de historial legible, vista **side-by-side** (diff doc + diff có
 ## 10. Plan de hitos
 
 ### Hito 0 — Repo y validación del formato (sin IA, sin lógica compleja)
-- [ ] Crear repo, `README.md`, `CLAUDE.md`, `docs/CONTEXTO.md`.
-- [ ] Scaffold de la extensión (TypeScript) que se active y muestre "Hola".
-- [ ] `examples/web-demo`: web React+Tailwind de 2 páginas (Home, Busqueda) con `data-uid` en los elementos.
-- [ ] Escribir a mano `Home.md` y `Home.json` del ejemplo.
-- [ ] Definir el **JSON Schema** v0 del componente.
+- [x] Crear repo, `README.md`, `CLAUDE.md`, `docs/CONTEXTO.md`.
+- [x] Scaffold de la extensión (TypeScript) que se active y muestre "Hola".
+- [x] `examples/web-demo`: web React+Tailwind de 2 páginas (Home, Busqueda) con `data-uid` en los elementos.
+- [x] Escribir a mano `Home.md` y `Home.json` del ejemplo.
+- [x] Definir el **JSON Schema** v0 del componente.
+- [x] Modo documento: código oculto en el explorador, con botón para mostrarlo (ver §2).
 
 ### Hito 1 — Camino rápido determinista (MVP)
-- [ ] Watcher: al guardar un `.md` de `frontend/paginas/`, parsearlo a JSON.
-- [ ] Diff JSON antiguo/nuevo → operaciones.
-- [ ] Resolver: id de componente → anclas → fichero y nodo por `data-uid`.
-- [ ] Aplicador para props tipadas básicas: `border-radius`, `color`, `texto` (editando clases Tailwind o estilo inline).
-- [ ] Mostrar diff del código (`vscode.diff`) para aceptar/rechazar.
-- [ ] Al aceptar: escribir código + actualizar JSON.
+- [x] Watcher: al guardar un `.md` de `frontend/paginas/`, parsearlo a JSON.
+- [x] Diff JSON antiguo/nuevo → operaciones.
+- [x] Resolver: id de componente → anclas → fichero y nodo por `data-uid`.
+- [x] Aplicador para props tipadas básicas: `border-radius`, `color`, `texto` (editando clases Tailwind o estilo inline).
+- [x] Mostrar diff del código (`vscode.diff`) para aceptar/rechazar.
+- [x] Al aceptar: escribir código + actualizar JSON.
 - **Demo de éxito:** cambiar `border-radius: 8px → 16px` en `Home.md`, guardar, aceptar diff, ver el cambio en la web.
+
+**Decisiones tomadas en el Hito 1:**
+- El `.md` se parsea a un árbol propio (sin anclas) y se compara con el JSON; el JSON nuevo = JSON actual + operaciones aceptadas. Las anclas nunca salen del JSON.
+- Props soportadas: `border-radius` (escala Tailwind v4: 8px → `rounded-lg`, 16px → `rounded-2xl`; otros valores → `rounded-[10px]`), `color` (nombre del tema: cambia `bg-/text-/border-…` y sus variantes `hover:…-oscuro`), `texto` (texto literal hijo del elemento) y `placeholder`.
+- El código se localiza con el AST de TypeScript (`data-uid` en JSX). Solo se editan `className` y textos **literales**; si son expresiones, la op falla con un mensaje.
+- Antes de editar se comprueba que el código coincide con el valor anterior del JSON; si no, se asume edición manual y la op falla sin tocar nada (sincronización inversa: Hito 5).
+- Lo no soportado (descripciones, props nuevas/eliminadas, cambios de tipo, estructura) se muestra como **pendiente** y no se aplica ni al código ni al JSON.
+- Revisión: un diff por fichero con botones ✓ Aceptar / ↺ Rechazar en la barra del editor (y en una notificación). Al aceptar se escribe el código con `WorkspaceEdit` (deshacer con Ctrl+Z) y el JSON se reescribe con `JSON.stringify(…, 2)`.
+- Errores del `.md` (yaml inválido, salto de nivel, falta `tipo`…) se marcan en el propio documento como diagnósticos.
 
 ### Hito 2 — Panel lateral e historial
 - [ ] Vista de árbol de componentes por página.

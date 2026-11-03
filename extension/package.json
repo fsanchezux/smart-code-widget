@@ -1,0 +1,110 @@
+{
+  "name": "smart-code-widget",
+  "displayName": "Smart Code Widget",
+  "description": "Lenguaje web declarativo basado en documentos: sincroniza documento ⇄ JSON ⇄ código.",
+  "version": "0.0.1",
+  "publisher": "fsanchezrdev",
+  "private": true,
+  "license": "UNLICENSED",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./out/src/extension.js",
+  "activationEvents": [
+    "workspaceContains:Stack.md"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "smartCodeWidget.hola",
+        "title": "Hola",
+        "category": "Smart Code Widget"
+      },
+      {
+        "command": "smartCodeWidget.mostrarCodigo",
+        "title": "Mostrar código",
+        "category": "Smart Code Widget",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "smartCodeWidget.ocultarCodigo",
+        "title": "Ocultar código",
+        "category": "Smart Code Widget",
+        "icon": "$(eye-closed)"
+      },
+      {
+        "command": "smartCodeWidget.aceptarCambios",
+        "title": "Aceptar cambios",
+        "category": "Smart Code Widget",
+        "icon": "$(check)"
+      },
+      {
+        "command": "smartCodeWidget.rechazarCambios",
+        "title": "Rechazar cambios",
+        "category": "Smart Code Widget",
+        "icon": "$(discard)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "smartCodeWidget.mostrarCodigo",
+          "when": "view == workbench.explorer.fileView && smartCodeWidget.proyecto && smartCodeWidget.codigoOculto",
+          "group": "navigation@0"
+        },
+        {
+          "command": "smartCodeWidget.ocultarCodigo",
+          "when": "view == workbench.explorer.fileView && smartCodeWidget.proyecto && !smartCodeWidget.codigoOculto",
+          "group": "navigation@0"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "smartCodeWidget.aceptarCambios",
+          "when": "resourceScheme == scw-propuesta && smartCodeWidget.propuestaPendiente",
+          "group": "navigation@0"
+        },
+        {
+          "command": "smartCodeWidget.rechazarCambios",
+          "when": "resourceScheme == scw-propuesta && smartCodeWidget.propuestaPendiente",
+          "group": "navigation@1"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "smartCodeWidget.aceptarCambios",
+          "when": "smartCodeWidget.propuestaPendiente"
+        },
+        {
+          "command": "smartCodeWidget.rechazarCambios",
+          "when": "smartCodeWidget.propuestaPendiente"
+        },
+        {
+          "command": "smartCodeWidget.mostrarCodigo",
+          "when": "smartCodeWidget.proyecto && smartCodeWidget.codigoOculto"
+        },
+        {
+          "command": "smartCodeWidget.ocultarCodigo",
+          "when": "smartCodeWidget.proyecto && !smartCodeWidget.codigoOculto"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p .",
+    "watch": "tsc -p . --watch",
+    "test": "npm run compile && node --test \"out/test/**/*.test.js\""
+  },
+  "dependencies": {
+    "ajv": "^8.20.0",
+    "typescript": "~6.0.3",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "~20.19.43",
+    "@types/vscode": "~1.100.0"
+  }
+}
