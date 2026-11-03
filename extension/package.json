@@ -46,6 +46,18 @@
         "title": "Rechazar cambios",
         "category": "Smart Code Widget",
         "icon": "$(discard)"
+      },
+      {
+        "command": "smartCodeWidget.verPaso",
+        "title": "Ver cambio",
+        "category": "Smart Code Widget",
+        "icon": "$(diff)"
+      },
+      {
+        "command": "smartCodeWidget.volverAntesDePaso",
+        "title": "Volver a antes de este cambio",
+        "category": "Smart Code Widget",
+        "icon": "$(discard)"
       }
     ],
     "menus": {
@@ -89,8 +101,58 @@
         {
           "command": "smartCodeWidget.ocultarCodigo",
           "when": "smartCodeWidget.proyecto && !smartCodeWidget.codigoOculto"
+        },
+        {
+          "command": "smartCodeWidget.verPaso",
+          "when": "false"
+        },
+        {
+          "command": "smartCodeWidget.volverAntesDePaso",
+          "when": "false"
+        }
+      ],
+      "comments/comment/title": [
+        {
+          "command": "smartCodeWidget.verPaso",
+          "when": "commentController == smart-code-widget-historial && comment == paso",
+          "group": "inline@0"
+        },
+        {
+          "command": "smartCodeWidget.volverAntesDePaso",
+          "when": "commentController == smart-code-widget-historial && comment == paso",
+          "group": "inline@1"
         }
       ]
+    },
+    "configuration": {
+      "title": "Smart Code Widget",
+      "properties": {
+        "smartCodeWidget.ia.modo": {
+          "type": "string",
+          "enum": [
+            "preguntar",
+            "automatico",
+            "chat"
+          ],
+          "default": "preguntar",
+          "enumDescriptions": [
+            "Preguntar cada vez si resolver el prompt automáticamente o en el chat.",
+            "Lanzar Claude directamente (claude -p) y sustituir el prompt por las props.",
+            "Enviar el prompt al chat de agentes de VS Code; si no hay ninguno, lanzar Claude directamente."
+          ],
+          "description": "Cómo se resuelven los prompts *…* escritos en los bloques de props."
+        },
+        "smartCodeWidget.ia.comando": {
+          "type": "string",
+          "default": "claude",
+          "description": "Ejecutable de Claude Code para el modo automático."
+        },
+        "smartCodeWidget.ia.modelo": {
+          "type": "string",
+          "default": "",
+          "description": "Modelo para el modo automático (p. ej. haiku, sonnet). Vacío = el predeterminado de Claude Code."
+        }
+      }
     }
   },
   "scripts": {

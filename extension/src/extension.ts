@@ -1,5 +1,11 @@
 import * as vscode from 'vscode';
+import { AlmacenHistorial } from './history/almacen';
+import { volverAntesDe } from './history/volver';
 import { registrarSincronizacion } from './sincronizacion';
+import { registrarAsistenteProps } from './views/asistenteProps';
+import { ColoresDelTema } from './views/coloresTema';
+import { registrarHistorialComentarios } from './views/historialComentarios';
+import { Revision } from './views/revision';
 import { registrarVistaDocumentos } from './views/vistaDocumentos';
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
@@ -17,7 +23,15 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   if (raiz) {
     salida.appendLine(`Proyecto detectado: ${raiz.uri.fsPath}`);
     registrarVistaDocumentos(context, raiz);
-    registrarSincronizacion(context, raiz, salida);
+    const colores = new ColoresDelTema(raiz.uri);
+    const revision = new Revision(salida);
+    revision.registrar(context);
+    const historial = new AlmacenHistorial(raiz.uri);
+    const volver = (pagina: string, paso: number) => volverAntesDe(raiz.uri, historial, revision, pagina, paso);
+    context.subscriptions.push(colores.vigilar(), historial);
+    registrarSincronizacion(context, raiz, salida, colores, revision, historial);
+    registrarAsistenteProps(context, raiz, colores, historial);
+    registrarHistorialComentarios(context, historial, volver);
   }
 }
 

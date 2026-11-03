@@ -34,6 +34,11 @@ export function atributo(el: ts.JsxOpeningLikeElement, nombre: string): ts.JsxAt
   );
 }
 
+/** Código de la etiqueta de apertura del elemento con ese uid (`<button … >`). */
+export function aperturaPorUid(codigo: string, fichero: string, uid: string): string {
+  return apertura(buscarPorUid(codigo, fichero, uid)).getText();
+}
+
 /** Valor de un atributo escrito como literal ("..."); error si es una expresión. */
 export function atributoLiteral(el: ElementoJsx, nombre: string): { valor: string; inicio: number; fin: number } | undefined {
   const attr = atributo(apertura(el), nombre);

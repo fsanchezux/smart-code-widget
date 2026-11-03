@@ -15,3 +15,8 @@ Thumbs.db
 !examples/web-demo/Configuracion.md
 # Settings que escribe la extensión al probarla (files.exclude del modo documento)
 examples/web-demo/.vscode/
+# Skill que genera la extensión desde el catálogo
+examples/web-demo/.claude/
+examples/web-demo/.agents/
+# Historial de la extensión al probarla
+examples/web-demo/.lenguaje/

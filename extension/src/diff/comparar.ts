@@ -90,13 +90,13 @@ export function describir(op: Operacion): string {
     case 'prop':
       return `${nombre(op.componente)}.${op.prop}: ${op.antes} → ${op.despues}`;
     case 'prop-nueva':
-      return `${nombre(op.componente)}: prop nueva «${op.prop}» (aún no se sabe a qué ancla aplica)`;
+      return `${nombre(op.componente)}.${op.prop}: nueva = ${op.despues}`;
     case 'prop-eliminada':
       return `${nombre(op.componente)}: quitar la prop «${op.prop}»`;
     case 'tipo':
       return `${nombre(op.componente)}: cambiar tipo ${op.antes} → ${op.despues}`;
     case 'descripcion':
-      return `descripción de ${nombre(op.componente)} (Hito 3, IA)`;
+      return `descripción de ${nombre(op.componente)}`;
     case 'componente-nuevo':
       return `componente nuevo ${nombre(op.componente)} (Hito 4)`;
     case 'componente-eliminado':

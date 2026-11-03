@@ -147,6 +147,49 @@ test('propuesta: si el código se editó a mano, la op falla y no se toca nada',
   assert.equal(p.json.componentes['Home/BotonContacto'].props!['border-radius'].valor, '8px');
 });
 
+/** Líneas añadidas en `despues` respecto a `antes` (para inserciones de atributos). */
+function lineasNuevas(antes: string, despues: string): string[] {
+  const previas = new Set(antes.split('\n'));
+  return despues.split('\n').filter((l) => !previas.has(l)).map((l) => l.replace(/\r$/, ''));
+}
+
+test('prop nueva: se aplica a la única ancla visual y se añade al JSON', async () => {
+  const md = editar(homeMd, 'Titulo', 'texto: "Encuentra lo que buscas"', 'texto: "Encuentra lo que buscas"\n  border-radius: 8px');
+  const p = await proponerCambios(homeJson(), md, leer);
+
+  assert.equal(p.fallidas.length, 0);
+  assert.deepEqual(p.aplicadas.map((o) => o.tipo), ['prop-nueva']);
+  const [[antes, despues]] = lineasCambiadas(p.ficheros[0].original, p.ficheros[0].propuesto);
+  assert.match(antes, /data-uid="a2"/);
+  assert.equal(despues, antes.replace('tracking-tight"', 'tracking-tight rounded-lg"'));
+  assert.deepEqual(p.json.componentes['Home/Titulo'].props!['border-radius'], { valor: '8px', aplica: ['texto'] });
+});
+
+test('prop nueva: un atributo que no existe se inserta respetando un atributo por línea', async () => {
+  const md = editar(homeMd, 'BotonLimpiar', 'border-radius: 8px', 'border-radius: 8px\n  placeholder: "Vaciar"');
+  const p = await proponerCambios(homeJson(), md, leer);
+
+  assert.equal(p.fallidas.length, 0);
+  const { original, propuesto } = p.ficheros[0];
+  assert.deepEqual(lineasNuevas(original, propuesto), ['            placeholder="Vaciar"']);
+  assert.match(propuesto, /hover:bg-slate-100"\r?\n {12}placeholder="Vaciar"\r?\n {10}>/);
+  assert.equal(propuesto.includes('\r\n'), original.includes('\r\n'), 'mismo fin de línea que el fichero');
+  assert.ok(!/[^\r]\n/.test(propuesto) || !original.includes('\r\n'), 'sin mezclar LF y CRLF');
+});
+
+test('prop nueva: con varias anclas visuales o color, falla sin tocar nada', async () => {
+  let md = editar(homeMd, 'TarjetaProducto', 'border-radius: 12px', 'border-radius: 12px\n  texto: "Hola"');
+  md = editar(md, 'Titulo', 'texto: "Encuentra lo que buscas"', 'texto: "Encuentra lo que buscas"\n  color: primario');
+  const p = await proponerCambios(homeJson(), md, leer);
+
+  assert.equal(p.aplicadas.length, 0);
+  assert.equal(p.ficheros.length, 0);
+  const errores = p.fallidas.map((f) => f.error).join(' | ');
+  assert.match(errores, /varias anclas visuales \(tarjeta, nombre, precio\)/);
+  assert.match(errores, /«color» nuevo/);
+  assert.deepEqual(p.json, homeJson());
+});
+
 test('propuesta: lo no soportado queda pendiente y no cambia el JSON', async () => {
   const md = editar(homeMd, 'Hero', 'sombra suave.', 'sombra fuerte.');
   const p = await proponerCambios(homeJson(), md, leer);

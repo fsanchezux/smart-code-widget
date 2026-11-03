@@ -58,7 +58,7 @@
         },
         "props": {
           "type": "object",
-          "propertyNames": { "pattern": "^[a-z][a-z0-9-]*$" },
+          "propertyNames": { "pattern": "^([a-z0-9]+:)*[a-z][a-z0-9-]*$" },
           "additionalProperties": { "$ref": "#/$defs/prop" }
         },
         "hijos": {

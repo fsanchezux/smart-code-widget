@@ -150,7 +150,11 @@ Permite: panel de historial legible, vista **side-by-side** (diff doc + diff có
 - Anclas compartidas entre componentes (una clase CSS usada por dos): avisar o separar.
 - Anclas huérfanas tras edición manual del código: detectar y marcar en el doc.
 - Sincronización inversa: código editado a mano → proponer actualizar JSON/doc.
-- Catálogo de propiedades tipadas admitidas y su sintaxis.
+- ~~Catálogo de propiedades tipadas admitidas y su sintaxis.~~ → Propuesta v0 en `extension/src/schema/catalogo.ts` (≈50 props en 9 categorías: contenido, tipografía, color, espaciado, tamaño, layout, borde, efectos, estado/accesibilidad). Estilo con nombres CSS, contenido en español, valores cerrados siempre que se pueda y medidas en px.
+- **Modificadores** de estado y responsive delante de las props de estilo (◇): `hover:`, `focus:`, `active:`, `disabled:`, `sm:`, `md:`, `lg:`, `xl:`, `2xl:` y combinados (`md:hover:background`). Cada modificador es una prop independiente en el JSON (`"hover:background"`) y solo toca las clases con su mismo prefijo.
+- **Aplicadores** (✓): `texto`, `placeholder`, `color` y, por clases Tailwind, `border-radius`, `background`, `text-color`, `border-color`, `font-size`, `font-weight`, `text-align`, `text-transform`, `text-decoration`, `opacity`, `padding(-x/-y)`, `margin(-x/-y)`, `gap`, `border-width`, `shadow`, `transition`, `cursor`. Los colores admiten nombres del tema (`primario`) y de la paleta Tailwind (`green-500`).
+- Semántica de `color`: hoy es el color del tema del componente (cambia fondo, texto, borde y hover a la vez); `background`, `text-color` y `border-color` son los ajustes finos.
+- Props nuevas en el `.md`: si el componente tiene **una sola ancla visual**, se aplican a esa y se añaden al JSON con `aplica: [esa ancla]`. Con varias anclas visuales (p. ej. `TarjetaProducto`) fallan con un aviso: no se adivina. `color` nuevo tampoco se aplica (no se sabe qué clases sustituir); el resto (`border-radius`, `texto`, `placeholder`) sí: si falta la clase o el atributo, se añade. Quitar una prop sigue pendiente.
 - Cuánto texto libre se permite (más tipado = más valor frente a un prompt).
 
 ---
@@ -228,10 +232,21 @@ Permite: panel de historial legible, vista **side-by-side** (diff doc + diff có
 
 ### Hito 2 — Panel lateral e historial
 - [ ] Vista de árbol de componentes por página.
-- [ ] `historial.jsonl` con cada operación (JSON Patch).
-- [ ] Panel de historial con side-by-side y deshacer por pasos.
+- [x] `.lenguaje/historial.jsonl`: un paso por cambio aceptado (propuesta, IA o vuelta atrás) con `resumen`, `cambios` estructurados (componente, prop, antes, después), las props de cada componente afectado tal como quedaron y el contenido **antes/después** de cada fichero tocado (código, JSON y `.md`). Se guardan contenidos en vez de JSON Patch: volver atrás es restaurarlos en orden inverso, sin reinterpretar operaciones.
+- [x] Historial como **hilos de comentarios** en el `.md` (API de comentarios de VS Code): uno en el título con todos los pasos de la página y uno en cada componente con los suyos y sus props tras cada cambio. Cada comentario tiene **Ver cambio** (diff antes/después por fichero) y **Volver a antes de este cambio**.
+- [x] Volver atrás deshace el paso elegido y los posteriores de la página, en orden inverso, mostrando el diff para aceptar; queda registrado como un paso más (se puede volver de la vuelta). Si un fichero cambió después de un paso (edición manual) o el `.md` tiene cambios sin guardar, no se pisa.
+- [x] Hover sobre una prop: sus valores anteriores con enlace «volver a …».
+- El `.md` «antes» de cada paso se captura al guardar (último punto sincronizado), así que la vuelta atrás restaura también el documento.
 
 ### Hito 3 — IA para descripciones
+- [x] **Prompts en props (adelantado):** una línea `*petición*` dentro de `props:` se manda a la IA con un procedimiento fijo: **entender → preparar → cambiar** (código y `.md`), y nada más.
+  - **Props primero**: lo que se pueda expresar con props ✓ (con modificadores para estados y responsive: `hover:background: green-500` + `transition: colors`) se escribe como props en el `.md` y lo aplica la extensión (camino determinista).
+  - Solo si es imposible con props (animaciones, layouts complejos…) se implementa en el código de las anclas visuales del componente (normalmente su `className`) y se describe en una frase añadida a la descripción del componente, en el `.md` y en el JSON, para que los tres coincidan.
+  - **Skill del proyecto:** la extensión instala `.claude/skills/smart-code-widget/` (Claude Code) y `.agents/skills/smart-code-widget/` (resto de agentes) en el proyecto web (`SKILL.md` corto con el procedimiento + `catalogo.md` aparte, que solo se lee si hace falta). Se regenera si cambia el catálogo.
+  - Modo (`smartCodeWidget.ia.modo`): `preguntar` (por defecto), `automatico` o `chat`.
+  - `chat`: se abre el chat de agentes de VS Code (modo agente) con un prompt mínimo: «Usa el skill smart-code-widget. Resuelve en `<ruta>`: línea N (Componente): *…*». El chat muestra sus ediciones para conservarlas o deshacerlas. Si no hay ningún modelo de chat, se usa el automático.
+  - `automatico`: `claude -p` sin herramientas recibe el mismo procedimiento, el catálogo, la sección y la etiqueta de apertura de cada ancla visual, y devuelve JSON `{props, clases: {uid: className}, descripcion}`. Las props y la frase van al `.md`; las clases entran en la misma propuesta que las props, así que pasan por el diff revisable antes de tocar el código.
+  - Props fuera del catálogo y clases de uids ajenos al componente se descartan.
 - [ ] Cambio en la descripción libre → enviar diff + código de anclas a la IA → aplicar con revisión → reescribir sección del `.md`.
 
 ### Hito 4 — Operaciones estructurales
