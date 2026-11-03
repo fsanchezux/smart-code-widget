@@ -38,8 +38,7 @@ const editarAtributo = (nombre: string): Aplicador => (codigo, fichero, uid, _pr
 const editarTexto: Aplicador = (codigo, fichero, uid, _prop, antes, despues) => {
   const texto = textoLiteral(buscarPorUid(codigo, fichero, uid));
   if (antes !== undefined) comprobar(texto.valor, antes);
-  const nuevo = String(despues);
-  return reemplazar(codigo, texto.inicio, texto.fin, /[{}<>]/.test(nuevo) ? `{${JSON.stringify(nuevo)}}` : nuevo);
+  return reemplazar(codigo, texto.inicio, texto.fin, texto.escribir(String(despues)));
 };
 
 const APLICADORES: Record<string, Aplicador> = {

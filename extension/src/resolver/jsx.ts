@@ -49,16 +49,63 @@ export function atributoLiteral(el: ElementoJsx, nombre: string): { valor: strin
   return { valor: attr.initializer.text, inicio: attr.initializer.getStart(), fin: attr.initializer.getEnd() };
 }
 
-/** Texto hijo del elemento si es un único texto literal (sin {expresiones} ni elementos). */
-export function textoLiteral(el: ElementoJsx): { valor: string; inicio: number; fin: number } {
+export interface TextoEditable {
+  valor: string;
+  inicio: number;
+  fin: number;
+  /** Cómo escribir un texto nuevo en ese hueco (JSX o literal de cadena). */
+  escribir(nuevo: string): string;
+}
+
+/**
+ * Texto del elemento, para la prop `texto`:
+ * - texto literal hijo: `<h1>Hola</h1>`;
+ * - o `{variable}` cuyo valor inicial es un texto fijo: `const [titulo] = useState('Hola')` o `const titulo = 'Hola'`
+ *   (se edita ese valor inicial).
+ */
+export function textoLiteral(el: ElementoJsx): TextoEditable {
   if (ts.isJsxSelfClosingElement(el)) throw new ErrorAplicacion('El elemento no tiene contenido de texto');
   const hijos = el.children.filter((h) => !(ts.isJsxText(h) && h.containsOnlyTriviaWhiteSpaces));
-  const [texto] = hijos;
-  if (hijos.length !== 1 || !ts.isJsxText(texto)) {
-    throw new ErrorAplicacion('El contenido no es un texto literal (tiene expresiones o elementos); aún no se edita');
+  const [hijo] = hijos;
+  if (hijos.length === 1 && ts.isJsxText(hijo)) {
+    const crudo = hijo.getFullText();
+    const inicio = hijo.pos + crudo.length - crudo.trimStart().length;
+    const fin = hijo.end - (crudo.length - crudo.trimEnd().length);
+    return { valor: crudo.trim(), inicio, fin, escribir: (n) => (/[{}<>]/.test(n) ? `{${JSON.stringify(n)}}` : n) };
   }
-  const crudo = texto.getFullText();
-  const inicio = texto.pos + crudo.length - crudo.trimStart().length;
-  const fin = texto.end - (crudo.length - crudo.trimEnd().length);
-  return { valor: crudo.trim(), inicio, fin };
+  if (hijos.length === 1 && ts.isJsxExpression(hijo) && hijo.expression && ts.isIdentifier(hijo.expression)) {
+    const literal = valorInicial(hijo.expression.text, el.getSourceFile());
+    if (literal) {
+      const comilla = literal.getText()[0];
+      return {
+        valor: literal.text,
+        inicio: literal.getStart(),
+        fin: literal.getEnd(),
+        escribir: (n) => comilla + n.replace(/\\/g, '\\\\').replaceAll(comilla, `\\${comilla}`) + comilla,
+      };
+    }
+  }
+  throw new ErrorAplicacion('El contenido no es un texto literal ni una variable con texto inicial fijo; aún no se edita');
+}
+
+/** Literal de cadena con el que se inicializa `nombre` en el fichero: `const nombre = '…'` o `const [nombre] = useState('…')`. */
+function valorInicial(nombre: string, fuente: ts.SourceFile): ts.StringLiteralLike | undefined {
+  let encontrado: ts.StringLiteralLike | undefined;
+  const visitar = (nodo: ts.Node) => {
+    if (encontrado) return;
+    if (ts.isVariableDeclaration(nodo) && nodo.initializer) {
+      const declara = ts.isIdentifier(nodo.name)
+        ? nodo.name.text === nombre
+        : ts.isArrayBindingPattern(nodo.name) && nodo.name.elements[0]?.getText() === nombre;
+      const ini = nodo.initializer;
+      if (declara && ts.isIdentifier(nodo.name) && ts.isStringLiteralLike(ini)) encontrado = ini;
+      if (declara && ts.isArrayBindingPattern(nodo.name) && ts.isCallExpression(ini) && ini.expression.getText() === 'useState') {
+        const [arg] = ini.arguments;
+        if (arg && ts.isStringLiteralLike(arg)) encontrado = arg;
+      }
+    }
+    ts.forEachChild(nodo, visitar);
+  };
+  visitar(fuente);
+  return encontrado;
 }

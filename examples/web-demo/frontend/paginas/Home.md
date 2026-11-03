@@ -16,7 +16,7 @@ Bloque de bienvenida centrado, con fondo blanco y sombra suave.
 ```yaml
 tipo: text
 props:
-  texto: "Encuentra lo que buscas jajajaj"
+  texto: "Encuentra lo que buscas"
 ```
 El título usa Comic Sans y al hacer clic cambia a "Lorem Ipsum".
 

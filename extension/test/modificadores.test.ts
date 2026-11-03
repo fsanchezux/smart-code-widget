@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { propSoportada } from '../src/apply/props';
+import { aplicarProp, propSoportada } from '../src/apply/props';
 import { cambiarUtilidad } from '../src/apply/tailwind';
 import { contextoYaml, posicionEnProps } from '../src/parser/contextoYaml';
 import { proponerCambios } from '../src/propuesta';
@@ -66,4 +66,19 @@ test('demo: «fondo verde al pasar el ratón» como props llega al código y al 
   ));
   assert.deepEqual(p.json.componentes['Home/Hero'].props!['hover:background'], { valor: 'green-500', aplica: ['contenedor'] });
   assert.deepEqual(erroresPagina(p.json), []);
+});
+
+test('texto: {variable} con texto inicial fijo edita ese valor (useState o const)', () => {
+  const conEstado = [
+    "const [titulo, setTitulo] = useState('Hola');",
+    'const x = <h1 data-uid="a2" onClick={() => setTitulo(\'Otro\')}>',
+    '  {titulo}',
+    '</h1>;',
+  ].join('\n');
+  assert.ok(aplicarProp(conEstado, 'X.tsx', 'a2', 'texto', 'Hola', "Adiós, l'amic").includes(String.raw`useState('Adiós, l\'amic')`));
+  assert.throws(() => aplicarProp(conEstado, 'X.tsx', 'a2', 'texto', 'Otra cosa', 'Adiós'), /editó a mano/);
+
+  const conConst = 'const saludo = "Hola";\nconst x = <p data-uid="a3">{saludo}</p>;';
+  assert.ok(aplicarProp(conConst, 'X.tsx', 'a3', 'texto', 'Hola', 'Buenas').startsWith('const saludo = "Buenas";'));
+  assert.throws(() => aplicarProp('const x = <p data-uid="a3">{f()}</p>;', 'X.tsx', 'a3', 'texto', 'a', 'b'), /no es un texto literal/);
 });
