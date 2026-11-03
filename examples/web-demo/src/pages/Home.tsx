@@ -1,15 +1,22 @@
+import { useState } from 'react';
 import { productos } from '../data/productos';
 import { useSearch } from '../hooks/useSearch';
 
 export default function Home() {
+  const [titulo, setTitulo] = useState('Encuentra lo que buscas jajajaj');
   // @uid a6
   const { consulta, setConsulta, resultados, limpiar } = useSearch(productos);
 
   return (
     <main className="mx-auto max-w-5xl space-y-10 px-4 py-10">
-      <section data-uid="a1" className="rounded-2xl bg-white p-10 text-center shadow-sm">
-        <h1 data-uid="a2" className="text-4xl font-bold tracking-tight">
-          Encuentra lo que buscas jahe
+      <section data-uid="a1" className="rounded-2xl bg-white p-10 text-center shadow-sm hover:text-green-500 transition-colors">
+        <h1
+          data-uid="a2"
+          onClick={() => setTitulo('Lorem Ipsum')}
+          className="text-4xl font-bold tracking-tight"
+          style={{ fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}
+        >
+          {titulo}
         </h1>
         <p data-uid="a3" className="mx-auto mt-3 max-w-xl text-slate-600">
           Productos para tu casa y tu oficina, elegidos con cariño

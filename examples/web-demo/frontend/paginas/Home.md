@@ -7,6 +7,8 @@ Portada de la tienda: presentación y un buscador rápido de productos.
 tipo: section
 props:
   border-radius: 16px
+  hover:text-color: green-500
+  transition: colors
 ```
 Bloque de bienvenida centrado, con fondo blanco y sombra suave.
 
@@ -14,8 +16,9 @@ Bloque de bienvenida centrado, con fondo blanco y sombra suave.
 ```yaml
 tipo: text
 props:
-  texto: "Encuentra lo que buscas jahe"
+  texto: "Encuentra lo que buscas jajajaj"
 ```
+El título usa Comic Sans y al hacer clic cambia a "Lorem Ipsum".
 
 ### Subtitulo
 ```yaml

@@ -23,6 +23,18 @@
           "aplica": [
             "contenedor"
           ]
+        },
+        "hover:text-color": {
+          "valor": "green-500",
+          "aplica": [
+            "contenedor"
+          ]
+        },
+        "transition": {
+          "valor": "colors",
+          "aplica": [
+            "contenedor"
+          ]
         }
       },
       "hijos": [
@@ -43,12 +55,13 @@
       },
       "props": {
         "texto": {
-          "valor": "Encuentra lo que buscas jahe",
+          "valor": "Encuentra lo que buscas jajajaj",
           "aplica": [
             "texto"
           ]
         }
-      }
+      },
+      "descripcion": "El título usa Comic Sans y al hacer clic cambia a \"Lorem Ipsum\"."
     },
     "Home/Subtitulo": {
       "tipo": "text",
